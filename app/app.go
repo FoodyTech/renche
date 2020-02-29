@@ -49,5 +49,18 @@ func (app *App) initRoutes() http.Handler {
 	r.Use(middleware.StripSlashes)
 	r.Use(middleware.Timeout(1 * time.Minute))
 
+	r.Route("/", func(r chi.Router) {
+		r.HandleFunc("/render/{format}", app.renderHandler)
+
+		r.Route("/pages", func(r chi.Router) {
+			r.HandleFunc("/{id}/status", app.pageStatusHandler)
+			r.HandleFunc("/{id}/result/{format}", app.pageResultHandler)
+		})
+
+		r.Route("/sitemap", func(r chi.Router) {
+			r.HandleFunc("/xml/url", app.sitemapHandler)
+			r.HandleFunc("/xml/file", app.sitemapFileHandler)
+		})
+	})
 	return r
 }
